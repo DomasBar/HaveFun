@@ -1,10 +1,12 @@
+from random import randint, random, uniform
+
 from sprite_object import *
-from random import randint, random, choice, uniform
+
 
 class NPC(AnimatedSprite):
     def __init__(self, game, path='resources/sprites/npc/soldier/0.png', pos=(3, 3),
                  scale=0.6, shift=0.38, animation_time=180):
-        super().__init__(game, path,  pos, scale, shift, animation_time)
+        super().__init__(game, path, pos, scale, shift, animation_time)
         self.attack_images = self.get_images(self.path + '/attack')
         self.death_images = self.get_images(self.path + '/death')
         self.idle_images = self.get_images(self.path + '/idle')
@@ -53,10 +55,9 @@ class NPC(AnimatedSprite):
             if random() < self.accuracy:
                 self.game.player.get_hit(self.attack_damage)
 
-
     def animate_death(self):
         if not self.alive:
-            if self.animation_trigger and self.frame_counter < len(self.death_images):
+            if self.animation_trigger and self.frame_counter < len(self.death_images) - 1:
                 self.death_animation_started = True
                 self.death_images.rotate(-1)
                 self.image = self.death_images[0]
@@ -73,7 +74,6 @@ class NPC(AnimatedSprite):
                 self.game.sound.npc_pain.play()
                 self.game.player.fired = False
                 self.pain = True
-                print(self.game.weapon.damage)
                 self.health -= self.game.weapon.damage
                 self.check_health()
 
@@ -95,7 +95,6 @@ class NPC(AnimatedSprite):
 
                 if self.dist < self.attack_dist:
                     if randint(0, 30) < 10:
-                        print("ATTACK")
                         self.animate(self.attack_images)
                         self.attack()
                 else:
@@ -133,8 +132,8 @@ class NPC(AnimatedSprite):
         # horizontals
         y_hor, dy = (y_map + 1, 1) if sin_a > 0 else (y_map - 1e-6, -1)
 
+        # Fixes crash, when Sin reaches 0, game crashes, this one line fix it
         if sin_a == 0.0:
-                    # Fixes crash with some black magic help
             sin_a = 0.0000000000001
         depth_hor = (y_hor - oy) / sin_a
         x_hor = ox + depth_hor * cos_a
@@ -154,7 +153,7 @@ class NPC(AnimatedSprite):
             y_hor += dy
             depth_hor += delta_depth
 
-         # Verticals
+        # Verticals
         x_vert, dx = (x_map + 1, 1) if cos_a > 0 else (x_map - 1e-6, -1)
 
         depth_vert = (x_vert - ox) / cos_a
@@ -182,10 +181,8 @@ class NPC(AnimatedSprite):
             return True
         return False
 
+
 class SoldierNPC(NPC):
     def __init__(self, game, path='resources/sprites/npc/soldier/0.png', pos=(10.5, 5.5),
                  scale=0.6, shift=0.38, animation_time=180):
         super().__init__(game, path, pos, scale, shift, animation_time)
-
-
-

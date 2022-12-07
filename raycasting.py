@@ -1,5 +1,5 @@
 import pygame as pg
-import math
+
 from settings import *
 
 
@@ -15,6 +15,10 @@ class RayCasting:
         for ray, values in enumerate(self.ray_casting_result):
             depth, proj_height, texture, offset = values
 
+            # Negative proj_height causes crash
+            if proj_height < 0:
+                continue
+
             if proj_height < HEIGHT:
                 wall_column = self.textures[texture].subsurface(
                     offset * (TEXTURE_SIZE - SCALE), 0, SCALE, TEXTURE_SIZE
@@ -29,6 +33,10 @@ class RayCasting:
                 )
                 wall_column = pg.transform.scale(wall_column, (SCALE, HEIGHT))
                 wall_pos = (ray * SCALE, 0)
+
+            # Shade by depth to achieve a fog effect
+            shade = max(0, min(255, 400 - int(depth * 30)))
+            wall_column.fill(pg.Color(shade, shade, shade), None, pg.BLEND_MULT)
 
             self.objects_to_render.append((depth, wall_column, wall_pos))
 
@@ -89,7 +97,7 @@ class RayCasting:
                 x_hor %= 1
                 offset = (1 - x_hor) if sin_a > 0 else x_hor
 
-            # Nuimti "fishbowl" efekta
+            # Remove "fishbowl" effect
             depth *= math.cos(self.game.player.get_angle - ray_angle)
 
             # Projection
