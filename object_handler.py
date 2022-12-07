@@ -36,7 +36,7 @@ class ObjectHandler:
             self.hpRestored = True
 
         if reward > int(self.game.map.enemy_amount / 2) and not self.dmgIncreased:
-            self.game.weapon.set_damage_buff(1.3)
+            self.game.weapon.set_damage_buff(2)
             self.game.sound.dmgIncrease.play()
             self.dmgIncreased = True
 
